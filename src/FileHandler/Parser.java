@@ -29,8 +29,7 @@ public class Parser {
             }
 
             try (FileReader fileReader = new FileReader(file);
-                 BufferedReader bufferedReader = new BufferedReader(fileReader);
-                 FileWriter fileWriter = new FileWriter("D:\\Courses\\Bank\\src\\archive\\archive.txt")) {
+                 BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] fields = line.split("\\|");
@@ -62,12 +61,17 @@ public class Parser {
                         System.out.println("Numbers of account is not valid " + line);
                     }
                 }
-                fileWriter.write(String.valueOf(file));
-                fileWriter.flush();
+                File archive = new File("archive");
+                if (!archive.exists()) {
+                    archive.mkdir();
+                }
+                File archivedFile = new File(archive, file.getName());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+        update();
+        System.out.println("File parsing is complete");
     }
 
     private Account getAccount(String accountNumber) {
@@ -77,5 +81,15 @@ public class Parser {
             }
         }
         return null;
+    }
+
+    private void update() {
+        try (FileWriter fileWriter = new FileWriter("D:\\Courses\\Bank\\src\\numbers.txt")) {
+            for (Account account : accountList) {
+                fileWriter.write(account.getNumber() + " " + account.getBalance() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 }
